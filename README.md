@@ -5,6 +5,8 @@ A modern web app to **translate `.srt` subtitle files** into Arabic and 20+ worl
 ---
 
 ## Link to translate:
+
+
 https://subtitle-arabic-maker.onrender.com/
 
 ---
