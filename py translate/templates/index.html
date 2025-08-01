@@ -1,102 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <title>تعريب الأفلام</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-  <style>
-    body { background: #111; color: white; text-align: center; padding: 2rem; }
-    .container { max-width: 600px; margin: auto; }
-    #percent { font-size: 2rem; margin-top: 0.5rem; color: white; }
-    #download-link { display: none; font-size: 1.2rem; margin-top: 1rem; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1 class="mb-4">🎬 تعريب الأفلام</h1>
-    <form id="upload-form">
-      <div class="mb-3">
-        <input class="form-control" type="file" name="file" required>
-      </div>
-      <div class="mb-3 d-flex gap-2">
-        <select class="form-select" name="source_lang">
-          <option value="en">الإنجليزية</option>
-          <option value="es">الإسبانية</option>
-          <option value="fr">الفرنسية</option>
-          <option value="zh-CN">الصينية</option>
-          <option value="hi">الهندية</option>
-          <option value="pt">البرتغالية</option>
-          <option value="ru">الروسية</option>
-          <option value="ja">اليابانية</option>
-          <option value="de">الألمانية</option>
-          <option value="tr">التركية</option>
-          <option value="ar">العربية</option>
-        </select>
-        <select class="form-select" name="target_lang">
-          <option value="ar">العربية</option>
-          <option value="en">الإنجليزية</option>
-          <option value="fr">الفرنسية</option>
-          <option value="es">الإسبانية</option>
-          <option value="hi">الهندية</option>
-          <option value="pt">البرتغالية</option>
-          <option value="ru">الروسية</option>
-          <option value="zh-CN">الصينية</option>
-          <option value="de">الألمانية</option>
-          <option value="tr">التركية</option>
-          <option value="ja">اليابانية</option>
-        </select>
-      </div>
-      <button id="translate-btn" type="submit" class="btn btn-danger w-100">ترجم الآن</button>
-    </form>
-
-    <progress id="bar" value="0" max="100" class="w-100 mt-4" style="height: 30px;"></progress>
-    <div id="percent">0%</div>
-
-    <a id="download-link" class="btn btn-success" download>⬇️ تحميل الملف المترجم</a>
-  </div>
-
-  <script>
-    document.getElementById("upload-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-      const bar = document.getElementById("bar");
-      const percentText = document.getElementById("percent");
-      const btn = document.getElementById("translate-btn");
-      const downloadLink = document.getElementById("download-link");
-
-      btn.innerText = "قيد الترجمة...";
-      btn.disabled = true;
-
-      fetch("/upload", { method: "POST", body: formData })
-        .then(res => res.json())
-        .then(data => {
-          if (!data.success) throw new Error(data.error);
-
-          const interval = setInterval(() => {
-            fetch("/progress")
-              .then(res => res.json())
-              .then(progressData => {
-                const progress = parseFloat(progressData.progress).toFixed(2);
-                bar.value = progress;
-                percentText.innerText = `${progress}%`;
-
-                if (progress >= 100) {
-                  clearInterval(interval);
-                  btn.innerText = "تمت الترجمة ✅";
-                  btn.disabled = false;
-                  downloadLink.href = `/uploads/${progressData.filename}`;
-                  downloadLink.style.display = "inline-block";
-                }
-              });
-          }, 1000);
-        })
-        .catch(err => {
-          alert("حدث خطأ: " + err.message);
-          btn.innerText = "ترجم الآن";
-          btn.disabled = false;
-        });
-    });
-  </script>
-</body>
-</html>
